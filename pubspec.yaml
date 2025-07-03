@@ -37,6 +37,7 @@ dependencies:
   http: ^1.2.1
   video_player: ^2.8.6
   sign_in_button: ^3.0.0
+  firebase_core: ^2.30.0
 
 dev_dependencies:
   flutter_test:

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "825449294365",
+    "project_id": "learn-lite-ac0ad",
+    "storage_bucket": "learn-lite-ac0ad.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:825449294365:android:9d3e2da2b3bb2d0c0e34f4",
+        "android_client_info": {
+          "package_name": "Learn.lite.l07"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDFfM6Oy6HYmHav-TDobjOvF_G8UQjRqoM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
