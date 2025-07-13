@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+//import 'package:http/http.dart' as http;
+//import 'dart:convert';
 import 'dashboard_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class RegisterPage extends StatefulWidget {
-  const RegisterPage({super.key});
+  const RegisterPage({super.key}); 
 
   @override
   State<RegisterPage> createState() => _RegisterPageState();
@@ -17,13 +18,17 @@ class _RegisterPageState extends State<RegisterPage> {
   bool _obscure = true;
 
   Future<bool> registerUser(String email, String password) async {
-    final url = Uri.parse('http://localhost:3000/register');
-    final response = await http.post(
-      url,
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'email': email, 'password': password}),
-    );
-    return response.statusCode == 200;
+    try {
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      return true;
+    } on FirebaseAuthException catch (e) {
+      // Optionally, handle specific errors here
+      print('Firebase registration error: ${e.message}');
+      return false;
+    }
   }
 
   @override
