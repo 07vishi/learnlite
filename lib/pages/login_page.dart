@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dashboard_page.dart';
 import 'register_page.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -16,6 +17,7 @@ class _LoginPageState extends State<LoginPage> {
   String _email = '';
   String _password = '';
   bool _loading = false;
+  bool _obscurePassword = true;
 
   Future<void> loginUser() async {
     setState(() => _loading = true);
@@ -87,7 +89,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
-                  obscureText: true,
+                  obscureText: _obscurePassword,
                   decoration: InputDecoration(
                     hintText: 'Password',
                     filled: true,
@@ -98,8 +100,19 @@ class _LoginPageState extends State<LoginPage> {
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide.none,
                     ),
-                    suffixIcon: Icon(Icons.visibility_off_outlined,
-                        color: Colors.black38),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _obscurePassword
+                            ? Icons.visibility_off_outlined
+                            : Icons.visibility_outlined,
+                        color: Colors.black38,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _obscurePassword = !_obscurePassword;
+                        });
+                      },
+                    ),
                   ),
                   onSaved: (value) => _password = value ?? '',
                   validator: (value) =>
@@ -162,29 +175,50 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 18),
                 ElevatedButton.icon(
-                  onPressed: () {},
-                  icon: Image.asset('assets/google.png', height: 24),
-                  label: const Text(
-                    'Continue with Google',
-                    style: TextStyle(color: Colors.black87, fontWeight: FontWeight.w500),
+                  onPressed: () async {
+                    try {
+                      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+                      if (googleUser != null) {
+                        // Successfully signed in
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Signed in as ${googleUser.displayName}')),
+                        );
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (_) => DashboardPage()),
+                        );
+                      } else {
+                        // Sign in aborted
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Google sign-in cancelled')),
+                        );
+                      }
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Google sign-in error: $e')),
+                      );
+                    }
+                  },
+                  icon: Image.asset(
+                    'assets/google.png', // Add a Google logo asset or use an Icon
+                    height: 24,
+                    width: 24,
                   ),
+                  label: const Text('Continue with Google'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
-                    elevation: 0,
-                    side: const BorderSide(color: Color(0xFFE0E0E0)),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    foregroundColor: Colors.black87,
+                    minimumSize: const Size(double.infinity, 48),
+                    side: const BorderSide(color: Colors.black12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                   ),
                 ),
-                
                 const SizedBox(height: 12),
                 ElevatedButton.icon(
                   onPressed: () {},
-                  icon: Image.asset('assets/facebook.png', height: 24),
+                  icon: Image.asset('assets/apple.png', height: 24),
                   label: const Text(
-                    'Continue with Facebook',
+                    'Continue with Apple',
                     style: TextStyle(color: Colors.black87, fontWeight: FontWeight.w500),
                   ),
                   style: ElevatedButton.styleFrom(

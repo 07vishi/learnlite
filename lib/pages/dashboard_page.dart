@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
+import 'edit_profile_page.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -9,15 +10,11 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
+  String userName = 'User'; // Default
+
   @override
   Widget build(BuildContext context) {
-    final categories = [
-      '3D Design',
-      'Arts & Humanities',
-      'Graphic Design',
-      'Web Development',
-      'SEO & Marketing',
-    ];
+    final categories = ['3D Design', 'Graphic Design', 'Web Development'];
 
     final courses = [
       {
@@ -78,6 +75,15 @@ class _DashboardPageState extends State<DashboardPage> {
         'students': 9999,
         // Add 'localVideo': 'assets/videos/my_course.mp4', if you want to show a local video
       },
+      {
+        'title': 'Your New Course',
+        'category': 'Web Development',
+        'price': '1000/-',
+        'rating': 4.7,
+        'students': 5000,
+        'localVideo':
+            'assets/videos/your_new_video.mp4', // Add your video path here
+      },
     ];
 
     return Scaffold(
@@ -94,17 +100,17 @@ class _DashboardPageState extends State<DashboardPage> {
                 children: [
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
+                    children: [
                       Text(
-                        'Hi, User',
-                        style: TextStyle(
+                        'Hi, $userName',
+                        style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
                           color: Colors.black87,
                         ),
                       ),
-                      SizedBox(height: 4),
-                      Text(
+                      const SizedBox(height: 4),
+                      const Text(
                         'What Would you like to learn Today?\nSearch Below',
                         style: TextStyle(fontSize: 14, color: Colors.black54),
                       ),
@@ -112,13 +118,24 @@ class _DashboardPageState extends State<DashboardPage> {
                   ),
                   IconButton(
                     icon: const Icon(
-                      Icons.notifications_none_rounded,
-                      size: 28,
+                      Icons.account_circle,
+                      size: 32,
+                      color: Color(0xFF2563EB),
                     ),
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Notifications tapped!')),
+                    onPressed: () async {
+                      final updatedName = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const EditProfilePage(),
+                        ),
                       );
+                      if (updatedName != null &&
+                          updatedName is String &&
+                          updatedName.isNotEmpty) {
+                        setState(() {
+                          userName = updatedName;
+                        });
+                      }
                     },
                   ),
                 ],
@@ -257,16 +274,25 @@ class _DashboardPageState extends State<DashboardPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text(
-                    'Polupar Courses',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                    'Popular Courses',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                   ),
-                  TextButton(
+                  TextButton.icon(
                     onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('See all courses!')),
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              AllCoursesPage(courses: courses),
+                        ),
                       );
                     },
-                    child: const Text(
+                    icon: const Icon(
+                      Icons.arrow_forward,
+                      color: Color(0xFF2563EB),
+                      size: 18,
+                    ),
+                    label: const Text(
                       'SEE ALL',
                       style: TextStyle(
                         color: Color(0xFF2563EB),
@@ -276,13 +302,14 @@ class _DashboardPageState extends State<DashboardPage> {
                   ),
                 ],
               ),
+              const SizedBox(height: 12),
               // Courses List
               SizedBox(
-                height: 300,
+                height: 340,
                 child: ListView.separated(
                   scrollDirection: Axis.horizontal,
                   itemCount: courses.length,
-                  separatorBuilder: (_, __) => const SizedBox(width: 16),
+                  separatorBuilder: (_, __) => const SizedBox(width: 18),
                   itemBuilder: (context, index) {
                     final course = courses[index];
                     return GestureDetector(
@@ -292,44 +319,47 @@ class _DashboardPageState extends State<DashboardPage> {
                         );
                       },
                       child: Container(
-                        width: 260,
+                        width: 270,
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(18),
+                          borderRadius: BorderRadius.circular(22),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black12,
-                              blurRadius: 8,
-                              offset: Offset(0, 2),
+                              blurRadius: 12,
+                              offset: Offset(0, 4),
                             ),
                           ],
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // Placeholder for video/image
+                            // Video/Image area
                             ClipRRect(
                               borderRadius: const BorderRadius.only(
-                                topLeft: Radius.circular(18),
-                                topRight: Radius.circular(18),
+                                topLeft: Radius.circular(22),
+                                topRight: Radius.circular(22),
                               ),
-                              child: course['localVideo'] != null &&
+                              child:
+                                  course['localVideo'] != null &&
                                       course['localVideo'] != ''
-                                  ? LocalVideoPlayer(assetPath: course['localVideo'] as String)
+                                  ? LocalVideoPlayer(
+                                      assetPath: course['localVideo'] as String,
+                                    )
                                   : Container(
-                                      height: 110,
+                                      height: 130,
                                       color: Colors.black12,
                                       child: const Center(
                                         child: Icon(
                                           Icons.play_circle_fill,
                                           color: Color(0xFF2563EB),
-                                          size: 48,
+                                          size: 56,
                                         ),
                                       ),
                                     ),
                             ),
                             Padding(
-                              padding: const EdgeInsets.all(12.0),
+                              padding: const EdgeInsets.all(16.0),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -338,51 +368,73 @@ class _DashboardPageState extends State<DashboardPage> {
                                     style: const TextStyle(
                                       color: Color(0xFF2563EB),
                                       fontWeight: FontWeight.bold,
-                                      fontSize: 13,
+                                      fontSize: 14,
                                     ),
                                   ),
-                                  const SizedBox(height: 4),
+                                  const SizedBox(height: 6),
                                   Text(
                                     course['title'] as String,
                                     style: const TextStyle(
                                       fontWeight: FontWeight.bold,
-                                      fontSize: 16,
+                                      fontSize: 18,
+                                      color: Colors.black87,
                                     ),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
-                                  const SizedBox(height: 8),
+                                  const SizedBox(height: 12),
                                   Row(
                                     children: [
-                                      Text(
-                                        course['price'] as String,
-                                        style: const TextStyle(
-                                          color: Color(0xFF2563EB),
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 15,
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 4,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFE8EFFF),
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          course['price'] as String,
+                                          style: const TextStyle(
+                                            color: Color(0xFF2563EB),
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 15,
+                                          ),
                                         ),
                                       ),
-                                      const SizedBox(width: 8),
-                                      const Icon(
-                                        Icons.star,
-                                        color: Colors.amber,
-                                        size: 16,
+                                      Row(
+                                        children: [
+                                          const Icon(
+                                            Icons.star,
+                                            color: Colors.amber,
+                                            size: 18,
+                                          ),
+                                          Text(
+                                            '${course['rating']}',
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 15,
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                      Text(
-                                        '${course['rating']}',
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 8),
+                                      const SizedBox(width: 10),
                                       Text(
                                         '${course['students']} Std',
                                         style: const TextStyle(
                                           color: Colors.black54,
-                                          fontSize: 12,
+                                          fontSize: 13,
                                         ),
                                       ),
                                       const Spacer(),
                                       IconButton(
-                                        icon: const Icon(Icons.bookmark_border),
+                                        icon: Icon(
+                                          Icons.bookmark,
+                                          color: Colors.grey[400],
+                                        ),
                                         onPressed: () {
                                           ScaffoldMessenger.of(
                                             context,
@@ -395,7 +447,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                           );
                                         },
                                       ),
-                                    ]
+                                    ],
                                   ),
                                 ],
                               ),
@@ -407,7 +459,7 @@ class _DashboardPageState extends State<DashboardPage> {
                   },
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 32),
             ],
           ),
         ),
@@ -475,5 +527,128 @@ class _LocalVideoPlayerState extends State<LocalVideoPlayer> {
             color: Colors.black12,
             child: const Center(child: CircularProgressIndicator()),
           );
+  }
+}
+
+class AllCoursesPage extends StatelessWidget {
+  final List<Map<String, dynamic>> courses;
+
+  const AllCoursesPage({required this.courses, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('All Courses'),
+        backgroundColor: const Color(0xFF2563EB),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: ListView.separated(
+          itemCount: courses.length,
+          separatorBuilder: (_, __) => const SizedBox(height: 16),
+          itemBuilder: (context, index) {
+            final course = courses[index];
+            return Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 8,
+                    offset: Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  // Placeholder for video/image
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child:
+                        course['localVideo'] != null &&
+                            course['localVideo'] != ''
+                        ? LocalVideoPlayer(
+                            assetPath: course['localVideo'] as String,
+                          )
+                        : Container(
+                            width: 100,
+                            height: 100,
+                            color: Colors.black12,
+                            child: const Center(
+                              child: Icon(
+                                Icons.play_circle_fill,
+                                color: Color(0xFF2563EB),
+                                size: 48,
+                              ),
+                            ),
+                          ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          course['title'] as String,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          course['category'] as String,
+                          style: const TextStyle(
+                            color: Color(0xFF2563EB),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            Text(
+                              course['price'] as String,
+                              style: const TextStyle(
+                                color: Color(0xFF2563EB),
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            const Icon(
+                              Icons.star,
+                              color: Colors.amber,
+                              size: 16,
+                            ),
+                            Text(
+                              '${course['rating']}',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              '${course['students']} Std',
+                              style: const TextStyle(
+                                color: Colors.black54,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      ),
+    );
   }
 }
